@@ -30,7 +30,7 @@ define_method(:main) do |width = 640, height = 480, fps = 60, size = 100, partic
 	base = Triangle.new(
 		color: '#DA3337',
 		x1: centre, x2: @x4, x3:@x1,
-		y1: @y1 + @size / 1.5, y2: @y1, y3: @y1
+		y1: (@y1 - @y3) * 6.5, y2: @y1, y3: @y1
 	)
 
 	right_base = Triangle.new(
@@ -51,29 +51,69 @@ define_method(:main) do |width = 640, height = 480, fps = 60, size = 100, partic
 		y1: right_base.y1, y2: right_base.y1, y3: right_base.y2
 	)
 
-	Triangle.new(
+	down_base = Triangle.new(
 		color: %w(#FF0000 #FF00FF #FFFFFF), z: 1, opacity: 1,
 		x1: right_base.x1, x2: left_base.x1, x3: centre,
 		y1: centre_base.y1, y2: centre_base.y2, y3: base.y1
 	)
 
-	Triangle.new(
+	t1 = Triangle.new(
 		color: %w(#FFFF00 #FF00FF #FF50A6), opacity: 0.75,
-		x1: (centre + @x4) / 2, x2: centre, x3: @x4,
+		x1: @x3, x2: centre, x3: @x4,
 		y1: @y2, y2: @y1, y3: @y1
 	)
 
-	Triangle.new(
+	t2 = Triangle.new(
 		x1: centre, x2: @x3, x3: @x2,
 		y1: @y3, y2: @y1, y3: @y1,
 		color: '#FFFFFF', opacity: 0.5
 	)
 
-	Triangle.new(
+	t3 = Triangle.new(
 		x1: centre, x2: @x3, x3: @x2,
 		y1: @y1, y2: @y2, y3: @y3,
 		color: '#FFFFFF', opacity: 0.5,
 	)
+
+	on :mouse_scroll do |e|
+		op = e.delta_y == -1 ? :+ : :-
+
+		quad.x1 = quad.x1.method(op).(-1)
+		quad.x2 = quad.x2.method(op).(-1)
+		quad.x3 = quad.x3.method(op).(1)
+		quad.x4 = quad.x4.method(op).(1)
+		quad.y1 = quad.y1.method(op).(1)
+		quad.y2 = quad.y2.method(op).(-1)
+		quad.y3 = quad.y3.method(op).(-1)
+		quad.y4 = quad.y4.method(op).(1)
+
+		(1..4).each { |el| eval %Q{@x#{el}, @y#{el} = quad.x#{el}, quad.y#{el}} }
+		centre = quad.x1.+(quad.x4)./(2)
+
+		base.y1, base.y2, base.y3 = (@y1 - @y2) * 5.5, base.y2.method(op).(1), base.y3.method(op).(1)
+		base.x1, base.x2, base.x3 = centre, @x4, @x1
+
+		right_base.x1, right_base.x2, right_base.x3 = (@x1 + centre) / 2, @x1, centre
+		right_base.y1, right_base.y2, right_base.y3 = (base.y1 + base.y2) / 2, base.y2, base.y3
+
+		left_base.x1, left_base.x2, left_base.x3 = (centre + @x4) / 2, centre, @x4
+		left_base.y1, left_base.y2, left_base.y3 = (base.y1 + base.y2) / 2, base.y2, base.y3
+
+		centre_base.x1, centre_base.x2, centre_base.x3 = right_base.x1, left_base.x1, centre
+		centre_base.y1, centre_base.y2, centre_base.y3 = right_base.y1, right_base.y1, right_base.y2
+
+		down_base.x1, down_base.x2, down_base.x3 = right_base.x1, left_base.x1, centre
+		down_base.y1, down_base.y2, down_base.y3 = centre_base.y1, centre_base.y2, base.y1
+
+		t1.x1, t1.x2, t1.x3 = @x3, centre, @x4
+		t1.y1, t1.y2, t1.y3 = @y3, @y1, @y1
+
+		t2.x1, t2.x2, t2.x3 = centre, @x3, @x2
+		t2.y1, t2.y2, t2.y3 = @y3, @y1, @y1
+
+		t3.x1, t3.x2, t3.x3 = centre, @x3, @x2
+		t3.y1, t3.y2, t3.y3 = @y1, @y2, @y3
+	end
 
 	on :key_down do |k|
 		if k.key == 'f11'

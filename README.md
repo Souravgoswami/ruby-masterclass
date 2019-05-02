@@ -1,7 +1,7 @@
 # ruby-masterclass ![](https://github.com/Souravgoswami/ruby-masterclass/blob/master/logo/pngs/40x38.png)
 
 
-**A free course on Ruby  for Techno India college students.**
+**A free course on Ruby for Techno India (Saltlake) BCA college students.**
 
 Anyone on the web can propose new contents anytime.
 

@@ -1,4 +1,4 @@
-# ruby-masterclass ![](https://github.com/Souravgoswami/ruby-masterclass/blob/master/logo/pngs/40x38.png)
+# ruby-masterclass ![](https://github.com/Souravgoswami/ruby-masterclass/blob/master/logo/pngs/32x32.png)
 
 
 **A free course on Ruby for Techno India (Saltlake) BCA college students.**

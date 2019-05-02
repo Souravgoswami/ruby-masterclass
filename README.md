@@ -7,6 +7,4 @@ Anyone on the web can propose new contents anytime.
 
 Please feel free to fork, report bugs on the codes (if any).
 
-Please take a look at the current course contents here:
-
-    https://github.com/Souravgoswami/ruby-masterclass/tree/master/contents
+Please take a look at the current course contents [here.](https://github.com/Souravgoswami/ruby-masterclass/tree/master/contents/contents.pdf)

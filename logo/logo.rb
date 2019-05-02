@@ -1,4 +1,4 @@
-#!/usr/bin/ruby -w
+#!/usr/bin/env ruby
 %w(ruby2d securerandom open3).each { |el| require(el) }
 
 WIDTH = 1280
@@ -112,9 +112,7 @@ define_method(:main) do |width = 640, height = 480, fps = 60, size = 100, partic
 		end
 	end
 
-	on :mouse_scroll do |e|
-		change_size.(op = e.delta_y == -1 ? :+ : :-)
-	end
+	on :mouse_scroll do |e| change_size.(e.delta_y == -1 ? :+ : :-) end
 
 	on :key_held do |k|
 		change_size.(
@@ -125,7 +123,7 @@ define_method(:main) do |width = 640, height = 480, fps = 60, size = 100, partic
 	end
 
 	on :key_down do |k|
-		close if Open3.pipeline_start("ruby #{File.join(__FILE__)} #{@fullscreen += 1}") if k.key == 'f11'
+		close if Open3.pipeline_start("#{File.join(RbConfig::CONFIG['bindir'], 'ruby')} #{File.join(__FILE__)} #{@fullscreen += 1}") if k.key == 'f11'
 		close if k.key == 'escape'
 		Window.screenshot if k.key == 'printscreen'
 	end
@@ -139,5 +137,4 @@ define_method(:main) do |width = 640, height = 480, fps = 60, size = 100, partic
 end
 
 main(WIDTH, HEIGHT, FPS, SIZE, PARTICLES, FROZEN_PARTICLES, TITLE, BORDER)
-
 show

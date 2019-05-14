@@ -24,4 +24,4 @@ We like to be social and we are. But for some safety and other important reasons
 Feel free to edit, distribute, fork and do whatever you want. Any contribution will be helpful, and is welcomed.
 
 ## Bugs 🐞
-Please feel free to notify me about bugs 🐛 in the codes via ![GitHub 🐙](https://github.com/Souravgoswami/ruby-masterclass/issues/new/choose), via [Gitter 💬](https://gitter.im/ruby-masterclass/ruby-masterclass) or ![email me ✉️](souravgoswami@protonmail.com)
+Please feel free to notify me about bugs 🐛 in the codes via ![GitHub 🐙](https://github.com/Souravgoswami/ruby-masterclass/issues/new/choose), via [Gitter 💬](https://gitter.im/ruby-masterclass/ruby-masterclass) or email me ✉️ souravgoswami@protonmail.com.

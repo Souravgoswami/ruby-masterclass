@@ -15,7 +15,7 @@ Joining the class is only available for the college students from BCA dept. But 
 Please feel free to fork, report bugs on the codes (if any).
 
 ## Licence 🔑
-This is an unlicensed project.
+This is an unlicenced project.
 
 ## Contents 📝
 Please take a look at the [current course contents here.](https://github.com/Souravgoswami/ruby-masterclass/tree/master/contents/contents.pdf). Proposing new contents on [Gitter chat](https://gitter.im/ruby-masterclass/ruby-masterclass) are welcomed.

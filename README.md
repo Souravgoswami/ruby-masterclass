@@ -20,7 +20,7 @@ Please take a look at the [current course contents here.](https://github.com/Sou
 ## Chatting and Asking Questions 💬
 We like to be social and we are. But for some safety and other important reasons we chose [Gitter](https://gitter.im/ruby-masterclass/ruby-masterclass) over other online messaging platforms:- So feel free to [chat with us!](https://gitter.im/ruby-masterclass/ruby-masterclass)
 
-## Contribution 💎
+## Contribution 🌟
 Feel free to edit, distribute, fork and do whatever you want. Any contribution will be helpful, and is welcomed.
 
 ## Bugs 🐞

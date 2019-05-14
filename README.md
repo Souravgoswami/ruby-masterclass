@@ -21,4 +21,4 @@ This is an unlicensed project.
 Please take a look at the [current course contents here.](https://github.com/Souravgoswami/ruby-masterclass/tree/master/contents/contents.pdf). Proposing new contents on [Gitter chat](https://gitter.im/ruby-masterclass/ruby-masterclass) are welcomed.
 
 ## Chatting with Us 💬
-We like to be social and we are. But for some safety and other important reasons we chose [Gitter](https://gitter.im/ruby-masterclass/ruby-masterclass) over other online messaging platforms :- So feel free to [chat with us!](https://gitter.im/ruby-masterclass/ruby-masterclass)
+We like to be social and we are. But for some safety and other important reasons we chose [Gitter](https://gitter.im/ruby-masterclass/ruby-masterclass) over other online messaging platforms:- So feel free to [chat with us!](https://gitter.im/ruby-masterclass/ruby-masterclass)

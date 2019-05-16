@@ -12,7 +12,14 @@ The course commence date will be disclosed to the interested students.
 Joining the class is only available for the college students from BCA dept. But *anyone* on the web can join the ![Gitter chat](https://gitter.im/ruby-masterclass/ruby-masterclass).
 
 ## Licence 🔑
-This is an unlicenced project.
+#### Source Codes
+ + This is an unlicenced project. That is, the source codes can be modified, distributed or can be sold without any permission.
+
+#### Fonts 🖊
+ + I have ![uploaded the fonts](https://github.com/Souravgoswami/ruby-masterclass/tree/master/Designs/fonts) in case you ever need that (may be to run the presenations). These fonts are free for commercial usage. Nevertheless, this whole project focuses only on open source technology. All the credit goes to the respective owners.
+
+#### Images 🖼
++ All the images used in the presentations are copyleft. But I thank to all the creators and designers for such great contents.
 
 ## Contents 📝
 Please take a look at the [current course contents here.](https://github.com/Souravgoswami/ruby-masterclass/tree/master/contents/contents.pdf). Proposing new contents on [Gitter chat](https://gitter.im/ruby-masterclass/ruby-masterclass) are welcomed.

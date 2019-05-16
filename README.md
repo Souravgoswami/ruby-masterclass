@@ -1,4 +1,4 @@
-# Ruby MasterClass ![Ruby MasterClass](https://github.com/Souravgoswami/ruby-masterclass/blob/master/logo/pngs/32x32.png)
+# Ruby MasterClass ![Ruby MasterClass](https://github.com/Souravgoswami/ruby-masterclass/blob/master/Designs/logo/pngs/32x32.png)
 
 ## 🚧 The Contents are Under Development 🚧
 

@@ -12,7 +12,7 @@ The course commence date will be disclosed to the interested students.
 Joining the class is only available for the college students from BCA dept. But *anyone* on the web can join the ![Gitter chat](https://gitter.im/ruby-masterclass/ruby-masterclass).
 
 ## Licence 🔑
-#### Source Codes
+#### Source Codes 🍭
  + This is an unlicenced project. That is, the source codes can be modified, distributed or can be sold without any permission.
 
 #### Fonts 🖊

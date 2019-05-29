@@ -22,7 +22,6 @@ set width: @width, height: @height, background: '#000000', fps_cap: @fps
 
 class Snake
 	attr_accessor(:direction, :lives)
-	@@width, @@height = Window.width, Window.height
 
 	define_method(:reset) do
 		@positions.replace(Array.new(4) { |i| [GRID_SIZE, i * GRID_SIZE] })
@@ -59,7 +58,7 @@ class Snake
 	define_method(:y) { @positions[-1][-1] }
 	define_method(:grow) { @growing = true }
 	define_method(:collided?) { (@positions = @positions.uniq) && (return true) if @positions.uniq != @positions }
-	define_method(:new_coords) { |x, y| [x % (GRID_WIDTH * GRID_SIZE), (y.%(@@height.-(GRID_SIZE)))] }
+	define_method(:new_coords) { |x, y| [x % (GRID_WIDTH * GRID_SIZE), (y.%(Window.height.-(GRID_SIZE)))] }
 
 	protected(:new_coords)
 end
@@ -69,6 +68,7 @@ class Ball
 	define_method(:initialize) { @x, @y, @score, @finished = 0, GRID_SIZE, 0, false }
 	define_method(:draw) { |op| @ball = Square.new(x: @x, y: @y, size: GRID_SIZE - 1, color: '#FFFF00', z: 3, opacity: op ? 0 : 1) }
 	define_method(:eaten?) { |snake| @ball.contains?(snake.x, snake.y) }
+	define_method(:get_object) { @ball }
 
 	def shuffle(x = rand(Window.width / GRID_SIZE), y = rand(Window.height / GRID_SIZE - 2))
 		@x, @y = x * GRID_SIZE, y * GRID_SIZE
@@ -76,7 +76,7 @@ class Ball
 	end
 end
 
-snake, ball, score, streak, eaten, i, o, game_over, collided = Snake.new, Ball.new.shuffle, 0, 0, 0, 0, 0, true, true
+snake, ball, score, streak, eaten, i, o, game_over, collided, j, g, message = Snake.new, Ball.new.shuffle, 0, 0, 0, 0, 0, true, true, 0, 1, ''
 
 on :key_down do |k|
 	snake.direction = k.key if snake.movable?(k.key) if k.key =~ /^(up|down|right|left)+$/
@@ -101,20 +101,26 @@ update do
 
 	unless game_over
 		snake.move.draw
+		Text.new(message, font: FONT, size: 40, opacity: j).tap { |t| t.x, t.y = @width / 2 - t.width / 2, @height / 2 - t.height / 2 + j * 25 } if j > 0
+
+		g -= 0.01 unless g <= 0.005
+		ball.get_object.g = g
 
 		if ball.eaten?(snake)
-			@eaten_ball_music.play
-			streak, eaten = streak + 1, eaten + 1
-			score +=  streak
-			snake.lives += 1 if eaten % 5 == 0
+			g = 1
+			unless ball.get_object.g < 0.1
+				streak, eaten = streak + 1, eaten + 1
+				@eaten_ball_music.play
+				score += streak
+				j, message, snake.lives = 1, %w(Yummy! WoW! Amazing! Tasty! Spicy!).sample, snake.lives + 1 if eaten % 5 == 0
+			end
 			ball.shuffle
 			snake.grow
 		end
 
-		if snake.collided?
+		if snake.collided? || (ball.get_object.g < 0.4 && ball.eaten?(snake))
 			(game_over = @welcome_sound_not_playing = true) && @music.stop if snake.lives <= 0
-			(collided = true) && @explode.play unless collided
-			snake.lives -= 1
+			(collided, snake.lives = true, snake.lives - 1) && @explode.play unless collided
 		else
 			collided = false
 		end
@@ -123,8 +129,7 @@ update do
 	else
 		o += 0.05 if o < 0.5
 		Rectangle.new(color: '#000000', opacity: o, z: 10, width: @width, height: @height)
-		g_ovr = Text.new('Press Space to Start', font: FONT, z: 100, size: 40)
-		g_ovr.x, g_ovr.y = @width / 2 - g_ovr.width / 2, @height / 2 - g_ovr.height / 2
+		Text.new('Press Space to Start', font: FONT, z: 100, size: 40).tap { |g| g.x, g.y = @width / 2 - g.width / 2, @height / 2 - g.height / 2}
 
 		snake.direction = if snake.y > ball.y || snake.y < ball.y then 'down'
 			elsif snake.x > ball.x then 'left'
@@ -133,17 +138,12 @@ update do
 
 		snake.movable?(snake.direction) ? snake.move.draw : ((snake.direction = %w(up down left right).sample) && snake.move)
 		ball.shuffle if ball.eaten?(snake)
-
-		if @welcome_sound_not_playing
-			@welcome_sound_not_playing = false
-			@welcome_sound.play
-		end
+		(@welcome_sound_not_playing = false) || (@welcome_sound.play) if @welcome_sound_not_playing
 	end
 
 	Line.new(color: '#FFFFFF', x1: 0, x2: @width, y1: @height - GRID_HEIGHT + 3, y2: @height - GRID_HEIGHT + 3, z: 2, width: 1)
 	Line.new(color: '#000000', x1: 0, x2: @width, y1: @height - GRID_HEIGHT + 2, y2: @height - GRID_HEIGHT + 2, z: 2, width: 1)
-	s = Text.new("Score: #{score} | Lives: #{snake.lives < 0 ? 0 : snake.lives} | Eaten: #{eaten}", font: FONT, z: 2)
-	s.x, s.y = @width - s.width - 10, @height - s.height
+	Text.new("Score: #{score} | Lives: #{snake.lives < 0 ? 0 : snake.lives} | Eaten: #{eaten}", font: FONT, z: 2).tap { |s| s.x, s.y = @width - s.width - 10, @height - s.height }
 end
 
 show

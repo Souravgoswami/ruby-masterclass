@@ -6,7 +6,29 @@ fullscreen, particles_speed, design_chooser, font_chooser, soundvar = ARGV[0].to
 fonts = Dir.children(File.join(PATH, %w(Assets Fonts))).map { |f| File.join("#{PATH}", %w(Assets Fonts), "#{f}") }
 FONT = fonts[font_chooser % fonts.size]
 
-config_file = IO.readlines(File.join(PATH, 'config.conf')).map { |o| o.strip.downcase }
+config_file = if File.exist?(File.join(PATH, 'config.conf'))
+	IO.readlines(File.join(PATH, 'config.conf')).map { |o| o.strip.downcase }
+else
+	Kernel.warn "The config file doens't exist! Let me grab a copy of it."
+	begin
+		require 'net/http'
+		link = 'https://raw.githubusercontent.com/Souravgoswami/ruby-masterclass/master/Section%2045%3A%20Colour%3A%3AClock/config.conf'
+		Net::HTTP.get(URI(link)).tap { |data| File.write(File.join(PATH, 'config.conf'), data) }
+	rescue Errno::EACCES
+		Kernel.warn "Permission denied while trying to create #{File.join(PATH, 'config.conf')}!"
+		Kernel.warn "Please create the `config.conf` file, and paste in the contents of #{link}"
+	rescue SocketError
+		Kernel.warn "Unable to connect to the internet! Make sure you have an active internet connection!"
+		Kernel.warn "You can create the`config.conf` file, and paste in the contents of #{link}"
+	rescue Exception => e
+		Kernel.warn(e)
+	else
+		Kernel.warn "Successfully created #{File.join(PATH, 'config.conf')}. Restarting..."
+		Open3.pipeline_start("#{File.join(RbConfig::CONFIG['bindir'], 'ruby')} '#{__FILE__}' ")
+	end
+	exit! 0
+end
+
 read_config = ->(option) { config_file.select { |o| o.start_with?(option.downcase) }[-1].to_s.split('=')[-1].to_s.strip }
 
 %w(width height fps particles fontsize).zip(%w(640 480 60 300 50)).each do |v|

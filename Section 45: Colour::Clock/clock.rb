@@ -1,22 +1,34 @@
 #!/usr/bin/ruby -w
 %w(ruby2d open3 securerandom).each { |g| require(g) }
 
+PATH = File.dirname(__FILE__)
 fullscreen, particles_speed, design_chooser, font_chooser, soundvar = ARGV[0].to_i, ARGV[1].to_i.next, ARGV[2].to_i, ARGV[3].to_i, ARGV[4].to_i
-fonts = Dir.children(File.join(File.dirname(__FILE__), %w(Assets Fonts))).map { |f| File.join("#{File.dirname(__FILE__)}", %w(Assets Fonts), "#{f}") }
+fonts = Dir.children(File.join(PATH, %w(Assets Fonts))).map { |f| File.join("#{PATH}", %w(Assets Fonts), "#{f}") }
 FONT = fonts[font_chooser % fonts.size]
 
-@width, @height, @fps = 640, 480, 60
-set(width: @width, height: @height, fps_cap: @fps, fullscreen: fullscreen.odd?, title: 'Colour::Clock')
+config_file = IO.readlines(File.join(PATH, 'config.conf')).map { |o| o.strip.downcase }
+read_config = ->(option) { config_file.select { |o| o.start_with?(option.downcase) }[-1].to_s.split('=')[-1].to_s.strip }
+
+%w(width height fps particles fontsize).zip(%w(640 480 60 300 50)).each do |v|
+	begin
+		Kernel.eval(read_config.(v[0]).scan(/[0-9+\-\/*%.]/).join).to_i.tap { |o| binding.eval("@#{v[0]} = o == 0 ? #{v[1]} : o") }
+	rescue Exception => e
+		binding.eval("@#{v[0]} = #{v[1]}")
+		Kernel.warn("!!! #{e.to_s.capitalize}\nError Parsing the Configuration. Error:\n\t#{v[0].capitalize} = #{read_config.(v[0])}.\n\tFell back to #{v[1]}")
+	end
+end
+
+set(width: @width, height: @height, fps_cap: @fps, fullscreen: fullscreen.odd?, title: 'Colour::Clock', resizable: true)
 
 bg = Rectangle.new(width: @width, height: @height, color: %w(blue red green yellow))
-particles = Array.new(250) { Square.new(x: rand(@width), y: rand(@height), size: rand(1..2)) }
+particles = Array.new(@particles) { Square.new(x: rand(@width), y: rand(@height), size: rand(1..2)) }
 
-sound  = Music.new(File.join(File.dirname(__FILE__), %w(Assets Sounds 264498__foolboymedia__tick-tock.wav)), loop: true)
+sound  = Music.new(File.join(PATH, %w(Assets Sounds 264498__foolboymedia__tick-tock.wav)), loop: true)
 sound.play if soundvar.odd?
 
 time = -> { "#{Time.new.strftime('%H:%M:%S')}:#{Time.new.strftime('%N')[0..1]}" }
-timelabel = Text.new(time.call, font: FONT, size: 50).tap { |t| t.x, t.y = @width / 2 - t.width / 2 - 25, @height / 2 - t.height / 2}
-ampm = Text.new(Time.new.strftime('%p'), font: FONT, size: 50, x: timelabel.x + timelabel.width + 15, y: timelabel.y)
+timelabel = Text.new("00:00:00:00", font: FONT, size: @fontsize).tap { |t| t.x, t.y = @width / 2 - t.width / 2 - 25, @height / 2 - t.height / 2}
+ampm = Text.new(Time.new.strftime('%p'), font: FONT, size: @fontsize, x: timelabel.x + timelabel.width + 15, y: timelabel.y)
 
 design = <<~EOF.split("\n")
 	p.x, p.y = p.x + Math.cos(i) * particles_speed, p.y + Math.cos(i) * particles_speed
@@ -49,11 +61,24 @@ on :key_down do |k|
 	when 'right' then design_chooser += 1
 	when 'left' then design_chooser -= 1
 	when 'f1' then (soundvar += 1).odd? ? sound.play : sound.stop
+	when 'i'
+		bg.color = 4.times.each_with_object([]) { |i, a|
+			bg.color[i].tap { |c| a << '#' + [c.b, c.g, c.r].map { |x| (x * 255).ceil.to_s(16) }.map { |x| x.length == 1 ? '0' + x : x }.join }
+		} if Ruby2D::Color::Set === bg.color
 
-	when 'f2' then
+	when 'r'
+		bg.color = 4.times.each_with_object([]) { |i, a|
+			bg.color[i].tap { |c| a << '#' + [c.r, c.g, c.b].map { |x| (x * 255).ceil.to_s(16) }.map { |x| x.length == 1 ? '0' + x : x }.join }
+		}.rotate(-1) if Ruby2D::Color::Set === bg.color
+
+	when 'f2'
 		close if Open3.pipeline_start(
 			"#{File.join(RbConfig::CONFIG['bindir'], 'ruby')} '#{__FILE__}' #{[fullscreen, particles_speed, design_chooser, (font_chooser += 1), soundvar].join(' ')}"
 		)
+
+	when 'f3'
+		puts "Trying to spawn a new #{File.basename(__FILE__)} window!"
+		Open3.pipeline_start("#{File.join(RbConfig::CONFIG['bindir'], 'ruby')} '#{__FILE__}' #{[fullscreen, particles_speed, design_chooser, font_chooser, soundvar].join(' ')}")
 
 	when 'f11'
 		puts (fullscreen += 1).even? ? 'Window Mode' : 'Fullscreen Mode'

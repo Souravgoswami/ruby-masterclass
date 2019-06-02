@@ -13,3 +13,6 @@ This is a challenge section where students have to create an anagram program wit
 search('triangle')  # => ["alerting", "altering", "integral", "relating", "tanglier", "teraglin", "triangle"]
 
 + The output depends on the word file. Use the word file I have uploaded to ensure you have a vast wordlist!
+
+## Screenshot: 📸
+![Screenshot](https://github.com/Souravgoswami/ruby-masterclass/blob/master/Section%2038:%20Anagrams/Linux%20Dictionary.png)

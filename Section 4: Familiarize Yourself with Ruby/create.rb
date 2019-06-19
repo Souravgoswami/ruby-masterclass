@@ -1,7 +1,6 @@
 #!/usr/bin/ruby -w
 require 'fileutils'
 STDOUT.sync = STDERR.sync = true
-$stdout.sync = true
 
 module Kernel
 	undef p
@@ -29,16 +28,17 @@ module CodeEvaluator
 	end
 
 	def self.eval(*a, codes)
-		__index__, __binding__ = 0, binding
+		__index__, __arr__ = -1, []
 
-		while __index__ < codes.size
-			__vals__ = codes[__index__].strip.each_line.map { |d| d.strip.then { |e| e.empty? || e.start_with?(/#|=begin|=end/) ? [e, ''] : [e, "# => #{__binding__.eval(e).then { |ev| ev ? ev : 'nil'} }"] } }
+		while __index__ < codes.size - 1
+			__binding__ = binding
+			__vals__ = codes[__index__ += 1].strip.each_line.map { |d| d.strip.then { |e| e.empty? || e.start_with?(/#|=begin|=end/) ? [e, ''] : [e, "# => #{__binding__.eval(e).then { |ev| ev ? ev : 'nil'} }"] } }
 			__max_length__ = __vals__.map { |x| x[0].length }.to_a.max.to_i + 4
-			STDOUT.puts "Code: #{__index__.next}", __vals__.map { |val| val[0].strip.ljust(__max_length__) << val[1] }.join("\n").+("\n"), '-' * __max_length__
-
-			__index__ += 1
+			__arr__.push(
+				"Code: #{__index__.next}" + __vals__.map { |val| val[0].strip.ljust(__max_length__)
+					+ val[1] }.join("\n").+("\n") + '-' * __max_length__
+			)
 		end
+		__arr__
 	end
 end
-
-puts $PROGRAM_NAME == __FILE__

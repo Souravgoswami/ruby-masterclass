@@ -1,7 +1,7 @@
 #!/usr/bin/ruby -w
 require_relative(File.join(__dir__, 'create.rb'))
 
-CodeEvaluator.eval(
+puts CodeEvaluator.write_to_files(
 	%w(Intro_to_numbers Intro_to_assignment_operators Intro_to_global_and_local_variables
 		Intro_to_constants  Intro_to_object_methods_and_method_chaining
 		Intro_to_single_line_comments_and_multi-line_comments
@@ -170,8 +170,22 @@ CodeEvaluator.eval(
 
 		# STDIN.gets and $stdin.gets are similar.
 		# I think you all should use either STDIN.gets or $stdin.gets ;)
-		p STDIN.gets
-		p $stdin.gets
+		# Method chomp on string will remvoe the new line character!
+		p STDIN.gets.chomp
+
+		# Strip will remove spaces, tabs, new line characters after and before
+		p $stdin.gets.strip
+
+		# The methods .lstrip and rstrip will remove spaces, new line characters,
+		# tabs from the left and right respectively.
+		var = "\t\nSuperman\t\n"
+		p var.strip
+		p var.lstrip
+		p var.rstrip
+		p var.chomp
+
+		# Chop will remove the last character
+		p var.chop
 	',
 
 	"

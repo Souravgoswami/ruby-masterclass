@@ -4,14 +4,14 @@
 # But for performance reasons the object_id of          
 # true, false, Integers, Floats, nil, are fixed.        
                                                         
-'Hello'.object_id                                       # => 47070371946960
-'Hello'.object_id                                       # => 47070372019620
+'Hello'.object_id                                       # => 47066089867340
+'Hello'.object_id                                       # => 47066089878160
                                                         
 1.object_id                                             # => 3
 1.object_id                                             # => 3
                                                         
-[1, 2, 3].object_id                                     # => 47070372030440
-[1, 2, 3].object_id                                     # => 47070372052620
+[1, 2, 3].object_id                                     # => 47066090191780
+[1, 2, 3].object_id                                     # => 47066090190780
                                                         
 nil.object_id                                           # => 8
 nil.object_id                                           # => 8

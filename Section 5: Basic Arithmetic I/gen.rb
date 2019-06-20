@@ -81,18 +81,6 @@ puts CodeEvaluator.write_to_files(
 
 			# Ok this is heavier than `a += 4`... But it's possible
 			p a = a.next.succ.next.succ
-
-			# We are not on strings yet, but as I said, next is available
-			# on String objects
-			p 'Helln'.next
-			p 'Helln'.succ
-
-			# Surprisingly it will work for Bengali too!
-			p 'ক'.next
-
-			# For hindi! Ok it just takes the unicode and
-			# Some calculation which we will see later!!
-			p 'ख'.succ
 		",
 
 		"
@@ -222,8 +210,17 @@ puts CodeEvaluator.write_to_files(
 		"
 			# PART 11
 			# The formula is (T - 32) * (5 / 9) or (T - 32 * 0.555555)
-			p ((STDIN.gets.to_i - 32) * (5 / 9.0)).round(2)
-			p STDIN.gets.to_i.-(32).*(5 / 9.0).round(2)
+			# 1
+			print('Enter the Celcius: ')
+			puts STDIN.gets.to_i.-(32).*(5 / 9.0).round(2)
+
+			# 2
+			print('Enter the Celcius: ')
+			puts ((STDIN.gets.to_i - 32) * (5 / 9.0)).round(2)
+
+			# 3
+			print('Enter the Celcius: ')
+			puts STDIN.gets.to_i.then { |i| \"\#{i}°C = \#{((i - 32) * (5 / 9.0)).round(2)}°F\" }
 		"
 	]
 ) if $PROGRAM_NAME == __FILE__

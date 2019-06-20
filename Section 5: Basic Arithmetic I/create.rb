@@ -4,7 +4,7 @@ STDOUT.sync = STDERR.sync = true
 
 module Kernel
 	undef p
-	define_method(:p) { |*args| args.length == 1 ? args[0].to_s : args[1] }
+	define_method(:p) { |*args| args.length == 1 ? args[0].inspect : args[1] }
 end
 
 module CodeEvaluator

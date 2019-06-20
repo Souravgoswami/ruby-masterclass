@@ -3,13 +3,18 @@ p a = 5                                                         # => 5
 p a + 5                                                         # => 10
 p a                                                             # => 5
                                                                 
+p 5 ** 2                                                        # => 25
+# Ruby has no difficulty to work with very long integers        
+p 5 ** 100                                                      # => 7888609052210118054117285652827862296732064351090230047702789306640625
+                                                                
 p a += 5                                                        # => 10
 p a                                                             # => 10
                                                                 
 p a *= 10                                                       # => 100
-p a %= 6                                                        # => 4
-p a /= 2                                                        # => 2
-p a -= 1                                                        # => 1
+p a %= 30                                                       # => 10
+p a /= 2                                                        # => 5
+p a -= 1                                                        # => 4
+p a **= 3                                                       # => 64
                                                                 
 # Float objects are simply numbers with fractional part:        
 a = 5.0                                                         # => 5.0

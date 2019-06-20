@@ -43,13 +43,18 @@ puts CodeEvaluator.write_to_files(
 			p a + 5
 			p a
 
+			p 5 ** 2
+			# Ruby has no difficulty to work with very long integers
+			p 5 ** 100
+
 			p a += 5
 			p a
 
 			p a *= 10
-			p a %= 6
+			p a %= 30
 			p a /= 2
 			p a -= 1
+			p a **= 3
 
 			# Float objects are simply numbers with fractional part:
 			a = 5.0

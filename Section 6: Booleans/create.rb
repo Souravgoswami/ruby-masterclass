@@ -1,5 +1,4 @@
 #!/usr/bin/ruby -w
-require 'fileutils'
 STDOUT.sync = STDERR.sync = true
 
 module Kernel

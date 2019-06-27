@@ -6,6 +6,7 @@ puts CodeEvaluator.save_as(
 		Creating_Strings
 		String_Interpolation
 		Escape_Characters
+		The_*_method
 		Using_the_==_===_eql?_methods
 		length_size_count_methods
 		upcase_downcase_capitalize_swapcase
@@ -19,6 +20,7 @@ puts CodeEvaluator.save_as(
 		Intro_to_bang_methods
 		Intro_to_chomp_chop_strip_lstrip_rstrip_methods
 		Intro_to_index_rindex_methods
+		The_include?_method
 		Intro_to_squeeze_squeeze!_methods
 	),
 	[
@@ -45,6 +47,15 @@ puts CodeEvaluator.save_as(
 
 		"
 			# PART 2
+			# The String#* method can multipy a string n number of times
+			p '-' * 10
+			p 'hello ' * 3
+			p 'hi' + 'hello ' * 3 + 'hi'
+			p 'hi' * (3 + 3)
+		",
+
+		"
+			# PART 3
 			# String interpolation allows us to insert a value, a
 			# variable, or a constant inside a string:
 
@@ -63,7 +74,7 @@ puts CodeEvaluator.save_as(
 		",
 
 		"
-			# PART 3
+			# PART 4
 			# Escape characters follows a backslash and then a code.
 			# You have to use either \"\" or %Q or % syntax.
 			# For example:
@@ -79,7 +90,7 @@ puts CodeEvaluator.save_as(
 		",
 
 		"
-			# PART 4
+			# PART 5
 			# The == method is available on any object
 			# As we discussed earlier, it's equality operator, and
 			# != does the opposite
@@ -116,7 +127,7 @@ puts CodeEvaluator.save_as(
 		",
 
 		"
-			# PART 5
+			# PART 6
 			# The length, size, count methods
 			# Returns the character length of a string object.
 			p 'hello world'.size
@@ -128,7 +139,7 @@ puts CodeEvaluator.save_as(
 		",
 
 		"
-			# PART 6
+			# PART 7
 			# The upcase method converts lowercase characters in a string to uppercase
 			# The downcase method converts uppercase characters in a string to lowercase
 			# The capitalize method makes the first character of a string upcased, and all downcased
@@ -142,7 +153,7 @@ puts CodeEvaluator.save_as(
 			p '...'.capitalize
 		",
 		"
-			# PART 7
+			# PART 8
 			# The reverse method reverses a String and an Array.
 			# For now, let's concentrate on reversing Strings.
 			p 'Madam'.reverse
@@ -154,7 +165,7 @@ puts CodeEvaluator.save_as(
 		",
 
 		"
-			# PART 8
+			# PART 9
 			# String can be concatenated in the following ways
 			a = 'Hello '
 			p a + 'World'
@@ -185,7 +196,7 @@ puts CodeEvaluator.save_as(
 		",
 
 		"
-			# Part 9
+			# Part 10
 			# The empty method can be used to check if a string is empty or not!
 			# It might sound like stupid but we will see in block sections, how these
 			# methods (first, last on arrays (instead of [0] or [-1],
@@ -210,7 +221,7 @@ puts CodeEvaluator.save_as(
 		",
 
 		"
-			# PART 10
+			# PART 11
 			# A [n] after a string and array will return the n object
 			# A [0] after a string or an array will return the first object
 			# A [-1] after a string and array will return the last object
@@ -228,7 +239,7 @@ puts CodeEvaluator.save_as(
 		",
 
 		"
-			# PART 11
+			# PART 12
 			# In Ruby, Strings are mutable objects!
 			a = 'Perl is awesome'
 			a[0..3] = 'Ruby'
@@ -241,7 +252,7 @@ puts CodeEvaluator.save_as(
 		",
 
 		"
-			# PART 12
+			# PART 13
 			# The clear method clears a string without changing
 			# the object id. It's a good practice not to change the
 			# object id in case of strings, arrays, hashes, etc...
@@ -287,7 +298,7 @@ puts CodeEvaluator.save_as(
 		",
 
 		"
-			# PART 13
+			# PART 14
 			# The slice method works like bracket syntax
 			# But it's a method on string
 			a = 'I love the Ruby programming language'
@@ -311,7 +322,7 @@ puts CodeEvaluator.save_as(
 		",
 
 		"
-			# PART 14
+			# PART 15
 			# Did you notice bang methods on string objects?
 			# They are methods with ! at the end...
 			# Array and Hash objects also have bang methods on them!
@@ -349,7 +360,7 @@ puts CodeEvaluator.save_as(
 		",
 
 		"
-			# PART 15
+			# PART 16
 			# The chomp method, we used earlier, is used to strip off the extra newline
 			# character at the end of a string:
 			p \"a\\n\\n\\n\".chomp
@@ -381,7 +392,7 @@ puts CodeEvaluator.save_as(
 		",
 
 		"
-			# PART 16
+			# PART 17
 			# The index method returns the index of a character from left:
 			p 'Ruby is my favourite programming language!'.index('u')
 			# Here it's 1 because it's after R, which is in index 0
@@ -392,7 +403,7 @@ puts CodeEvaluator.save_as(
 		",
 
 		"
-			# PART 17
+			# PART 18
 			# The squeeze and squeeze! methods removes duplicates from
 			# a string if they occur right next ot each other!
 			a = 'Ruby or sapphire?!'
@@ -404,6 +415,17 @@ puts CodeEvaluator.save_as(
 			p a
 
 			p 'Mooooonday!'.squeeze
+		",
+
+		"
+			# PART 19
+			# The include method can check if a stirng contains a substring
+			p 'Hello'.include?('e')
+			p 'This is Ruby'.include?('Ruby')
+
+			a = 'Once upon a time, in a galaxy far far away'
+			p a.include? 'Once'
+			p a.include? 'once'
 		"
 	]
 ) if $PROGRAM_NAME == __FILE__

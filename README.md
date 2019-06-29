@@ -22,7 +22,7 @@ Joining the class is only available for the college students from BCA dept. But 
 + All the images used in the presentations are copyleft. But I thank to all the creators and designers for such great contents.
 
 ## Contents 📝
-Please take a look at the [current course contents here.](https://github.com/Souravgoswami/ruby-masterclass/tree/master/contents/contents.pdf). Proposing new contents on [Gitter chat](https://gitter.im/ruby-masterclass/ruby-masterclass) are welcomed.
+Please take a look at the [current course contents here](https://github.com/Souravgoswami/ruby-masterclass/tree/master/contents/contents.pdf). Proposing new contents on [Gitter chat](https://gitter.im/ruby-masterclass/ruby-masterclass) are welcomed.
 
 ## Chatting and Asking Questions 💬
 We like to be social and we are. But for some safety and other important reasons we chose [Gitter](https://gitter.im/ruby-masterclass/ruby-masterclass) over other online messaging platforms:- So feel free to [chat with us!](https://gitter.im/ruby-masterclass/ruby-masterclass)

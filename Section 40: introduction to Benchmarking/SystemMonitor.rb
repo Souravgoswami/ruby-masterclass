@@ -30,6 +30,9 @@ class String
 	end
 end
 
+Float.define_method(:lpad) { to_s.then { |x| x.split('.')[1].length == 1 ? x + '0' : x } }
+Float.define_method(:rpad) { to_s.then { |x| x.split('.')[0].length == 1 ? '0' + x : x } }
+
 def main(sleep = 0.05)
 	split_colour = [203, 198, 199, 164, 129, 93, 63, 33, 39, 44, 49, 48, 83, 118, 184, 214, 208]
 	swap, cpu_usage, cpu_bar = '', '', ''
@@ -42,8 +45,8 @@ def main(sleep = 0.05)
 		width = STDOUT.winsize[1]
 
 		# calculate memory usage
-		mem_total, mem_available = IO.readlines('/proc/meminfo').then { |x| [x[0], x[2]] }.map(&:split).then { |x| [x[0][1], x[1][1]] }.map { |x| x.to_i./(1024.0).round(1) }
-		mem_used = mem_total.-(mem_available).round(1)
+		mem_total, mem_available = IO.readlines('/proc/meminfo').then { |x| [x[0], x[2]] }.map(&:split).then { |x| [x[0][1], x[1][1]] }.map { |x| x.to_i./(1024.0).round(2) }
+		mem_used = mem_total.-(mem_available).round(2)
 
 		# calculate swap usage
 		swap_devs = IO.readlines('/proc/swaps')[1..-1].map(&:split).map { |x| [x[0], x[2], x[3]] }
@@ -63,26 +66,26 @@ def main(sleep = 0.05)
 			totald = idle + (@user + @nice + @sys + @irq + @softirq + @steal) -
 			(previdle + (@prev_user + @prev_nice + @prev_sys + @prev_irq + @prev_softirq + @prev_steal))
 
-			cpu_percentage = ((totald - (idle - previdle)) / totald * 100.0).round(1)
+			cpu_percentage = ((totald - (idle - previdle)) / totald * 100.0).round(2)
 			cpu_bar.replace(cpu_percentage < 33 ? bars[0] : cpu_percentage < 66 ? bars[1] : bars[2])
-			cpu_usage.concat("\e[38;5;".+((cpu_percentage < 33 ? COLOUR1 : cpu_percentage < 66 ? COLOUR2 : COLOUR3).to_s).+('m').+("#{cpu_bar} CPU #{i == 0 ? 'Total' : i}: #{cpu_percentage} %\e[0m\n"))
+			cpu_usage.concat("\e[38;5;".+((cpu_percentage < 33 ? COLOUR1 : cpu_percentage < 66 ? COLOUR2 : COLOUR3).to_s).+('m').+("#{cpu_bar} CPU #{i == 0 ? 'Total' : i}: #{cpu_percentage.lpad} %\e[0m\n"))
 		end
 
 		# String formatting and colourizing
-		tot = "Total: #{mem_total} MiB"
-		used = " \xf0\x9f\x93\x89Used: #{mem_used} MiB".center(width - tot.length * 2).rstrip
+		tot = "Total: #{mem_total.lpad} MiB"
+		used = " \xf0\x9f\x93\x89Used: #{mem_used.lpad} MiB".center(width - tot.length * 2).rstrip
 		mem_colour = "\e[38;5;#{mem_used < mem_total / 3 ? COLOUR1 : mem_used < mem_total / 2 ? COLOUR2 : COLOUR3}m"
 
 		swap.clear
 		swap_devs.size.times do |sd|
 			dev = swap_devs[sd]
-			al, av = dev[1].to_f./(1024).round(1), dev[2].to_f./(1024).round(1)
+			al, av = dev[1].to_f./(1024).round(2), dev[2].to_f./(1024).round(2)
 
 			swap_colour = "\e[38;5;#{av < al / 3 ? COLOUR1 : av < al / 2 ? COLOUR2 : COLOUR3}m"
 
 			allocated = "Total: #{al} MiB"
-			usage = " \xF0\x9F\x93\x8AUsed: #{av} MiB".center(width - allocated.length * 2 - 1).rstrip
-			available = swap_colour + " \xF0\x9F\x93\x8AAvailable: #{dev[1].to_f.-(dev[2].to_f)./(1024).round(1)} MiB".rjust(width - allocated.length - usage.length - 2) + "\e[0m"
+			usage = " \xF0\x9F\x93\x8AUsed: #{av.lpad} MiB".center(width - allocated.length * 2 - 1).rstrip
+			available = swap_colour + " \xF0\x9F\x93\x8AAvailable: #{dev[1].to_f.-(dev[2].to_f)./(1024).round(2).lpad} MiB".rjust(width - allocated.length - usage.length - 2) + "\e[0m"
 
 			swap.concat("#{SWAP_LABEL}\xE2\x80\xA3 #{dev[0]} \xF0\x9F\xA2\x90\e[0m\n" + swap_colour + allocated + usage + available + "\n\n")
 		end
@@ -98,7 +101,7 @@ def main(sleep = 0.05)
 			"\e[3J\e[H\e[2J"+ 'System Memory'.center(width).colourize(split_colour.rotate!) +
 			('-' * width).colourize(split_colour) +
 			mem_colour + tot + "\e[0m" + mem_colour + used + "\e[0m" + mem_colour +
-			" \xf0\x9f\x93\x89Available: #{mem_available} MiB".rjust(width - tot.length - used.length - 2) + "\e[0m\n\n" +
+			" \xf0\x9f\x93\x89Available: #{mem_available.lpad} MiB".rjust(width - tot.length - used.length - 2) + "\e[0m\n\n" +
 			'Swap'.center(width - 2).colourize(split_colour) + "\n" + '-'.*(width).colourize + swap + "\n" +
 			'CPU Usage'.center(width).colourize(split_colour) + "\n" + '-'.*(width).colourize +
 			cpu_usage + 'Time'.center(width).colourize(split_colour) + '-'.*(width).colourize(split_colour) + "\n" +

@@ -30,6 +30,8 @@ class String
 	end
 end
 
+Float.define_method(:pad) { to_s.then { |v| v.split('.')[-1].length == 1 ? v + '0' : v } }
+
 def main(sleep = 0.05)
 	split_colour = [203, 198, 199, 164, 129, 93, 63, 33, 39, 44, 49, 48, 83, 118, 184, 214, 208]
 	swap, cpu_usage, cpu_bar = '', '', ''
@@ -42,8 +44,8 @@ def main(sleep = 0.05)
 		width = STDOUT.winsize[1]
 
 		# calculate memory usage
-		mem_total, mem_available = IO.readlines('/proc/meminfo').then { |x| [x[0], x[2]] }.map(&:split).then { |x| [x[0][1], x[1][1]] }.map { |x| x.to_i./(1024.0).round(1) }
-		mem_used = mem_total.-(mem_available).round(1)
+		mem_total, mem_available = IO.readlines('/proc/meminfo').then { |x| [x[0], x[2]] }.map(&:split).then { |x| [x[0][1], x[1][1]] }.map { |x| x.to_i./(1024.0).round(2) }
+		mem_used = mem_total.-(mem_available).round(2)
 
 		# calculate swap usage
 		swap_devs = IO.readlines('/proc/swaps')[1..-1].map(&:split).map { |x| [x[0], x[2], x[3]] }
@@ -65,24 +67,24 @@ def main(sleep = 0.05)
 
 			cpu_percentage = ((totald - (idle - previdle)) / totald * 100.0).round(1)
 			cpu_bar.replace(cpu_percentage < 33 ? bars[0] : cpu_percentage < 66 ? bars[1] : bars[2])
-			cpu_usage.concat("\e[38;5;".+((cpu_percentage < 33 ? COLOUR1 : cpu_percentage < 66 ? COLOUR2 : COLOUR3).to_s).+('m').+("#{cpu_bar} CPU #{i == 0 ? 'Total' : i}: #{cpu_percentage} %\e[0m\n"))
+			cpu_usage.concat("\e[38;5;".+((cpu_percentage < 33 ? COLOUR1 : cpu_percentage < 66 ? COLOUR2 : COLOUR3).to_s).+('m').+("#{cpu_bar} CPU #{i == 0 ? 'Total' : i}: #{cpu_percentage.pad} %\e[0m\n"))
 		end
 
 		# String formatting and colourizing
-		tot = "Total: #{mem_total} MiB"
-		used = " \xf0\x9f\x93\x89Used: #{mem_used} MiB".center(width - tot.length * 2).rstrip
+		tot = "Total: #{mem_total.pad} MiB"
+		used = " \xf0\x9f\x93\x89Used: #{mem_used.pad} MiB".center(width - tot.length * 2).rstrip
 		mem_colour = "\e[38;5;#{mem_used < mem_total / 3 ? COLOUR1 : mem_used < mem_total / 2 ? COLOUR2 : COLOUR3}m"
 
 		swap.clear
 		swap_devs.size.times do |sd|
 			dev = swap_devs[sd]
-			al, av = dev[1].to_f./(1024).round(1), dev[2].to_f./(1024).round(1)
+			al, av = dev[1].to_f./(1024).round(2), dev[2].to_f./(1024).round(2)
 
 			swap_colour = "\e[38;5;#{av < al / 3 ? COLOUR1 : av < al / 2 ? COLOUR2 : COLOUR3}m"
 
 			allocated = "Total: #{al} MiB"
-			usage = " \xF0\x9F\x93\x8AUsed: #{av} MiB".center(width - allocated.length * 2 - 1).rstrip
-			available = swap_colour + " \xF0\x9F\x93\x8AAvailable: #{dev[1].to_f.-(dev[2].to_f)./(1024).round(1)} MiB".rjust(width - allocated.length - usage.length - 2) + "\e[0m"
+			usage = " \xF0\x9F\x93\x8AUsed: #{av.pad} MiB".center(width - allocated.length * 2 - 1).rstrip
+			available = swap_colour + " \xF0\x9F\x93\x8AAvailable: #{dev[1].to_f.-(dev[2].to_f)./(1024).round(2).pad} MiB".rjust(width - allocated.length - usage.length - 2) + "\e[0m"
 
 			swap.concat("#{SWAP_LABEL}\xE2\x80\xA3 #{dev[0]} \xF0\x9F\xA2\x90\e[0m\n" + swap_colour + allocated + usage + available + "\n\n")
 		end
@@ -98,14 +100,21 @@ def main(sleep = 0.05)
 			"\e[3J\e[H\e[2J"+ 'System Memory'.center(width).colourize(split_colour.rotate!) +
 			('-' * width).colourize(split_colour) +
 			mem_colour + tot + "\e[0m" + mem_colour + used + "\e[0m" + mem_colour +
-			" \xf0\x9f\x93\x89Available: #{mem_available} MiB".rjust(width - tot.length - used.length - 2) + "\e[0m\n\n" +
+			" \xf0\x9f\x93\x89Available: #{mem_available.pad} MiB".rjust(width - tot.length - used.length - 2) + "\e[0m\n\n" +
 			'Swap'.center(width - 2).colourize(split_colour) + "\n" + '-'.*(width).colourize + swap + "\n" +
 			'CPU Usage'.center(width).colourize(split_colour) + "\n" + '-'.*(width).colourize + cpu_usage +
 			"\n" + 'Frequency: '.colourize + "\n" +
-			(0..3).map { |i| "CPU#{i.next}: ".+(IO.read("/sys/devices/system/cpu/cpu#{i}/cpufreq/cpuinfo_cur_freq")).colourize(split_colour) }.join +
+
+			(0..3).map do |i|
+				"CPU#{i.next}: #{IO.read("/sys/devices/system/cpu/cpu#{i}/cpufreq/cpuinfo_cur_freq").to_f./(1000.0).round(2).pad} MHz"
+				.colourize(split_colour)
+			end.join("\n") +
+
 			"\n" + 'Temperature: '.colourize(split_colour) +
+
 			IO.read('/sys/class/thermal/thermal_zone0/temp').to_i./(1000.0).then{ |c| "#{c.round(2)}\xC2\xB0C | #{c.*(1.8).+(32).round(2)}\xC2\xB0F" }
 				.colourize(split_colour) + "\n" +
+
 			'Time'.center(width).colourize(split_colour) + '-'.*(width).colourize +
 			(clocks.rotate![0] + ' ' + current_time +
 			"\xE2\xAC\x86\xEF\xB8\x8F Uptime: #{hr}:#{min}:#{sec}".rjust(width - current_time.length - 2)).colourize(split_colour)

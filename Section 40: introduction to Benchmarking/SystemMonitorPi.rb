@@ -1,42 +1,40 @@
 #!/usr/bin/env ruby
+GC.start(full_mark: true, immediate_sweep: true)
 require 'io/console'
 
 STDOUT.sync = true
-GC.start(full_mark: true, immediate_sweep: true)
-
 COLOUR1 = 40
 COLOUR2 = 63
 COLOUR3 = 196
 COLOUR_TITLE = "\e[1;33m"
 SWAP_LABEL = "\e[1;38;5;165m"
+ROUND = ARGV.select { |x| x.start_with?(/--round=|-r=/) }[-1].to_s.split('=')[-1].to_i.then { |x| x > 0 ? x.to_i : 2 }
 TIME_FORMAT = ARGV.select { |x| x.start_with?(/(-f|--format)=/) }[0].to_s.split('=')[-1].then { |x| x ? x : "%I:%M:%S:%2N %p" }
 
-class String
-	def colourize(colour = [154, 184, 208, 203, 198, 164, 129, 92])
-		clr, val = colour.dup.concat(colour.reverse), ''
+String.define_method(:colourize) do |colour = [154, 184, 208, 203, 198, 164, 129, 92]|
+	clr, return_val = colour.dup.concat(colour.reverse), ''
+	colour_size = clr.size - 1
 
-		each_line do |str|
-			str_len, colour_size, i, index = str.length - 1, clr.size, -1, 0
-			div = str.length./(colour_size).then { |x| x == 0 ? 1 : x }
-			colour_size -= 1
+	str_len, i, index = length - 1, -1, 0
+	div = delete("\s").length./(colour_size.next).then { |x| x == 0 ? 1 : x }
 
-			while i < str_len do
-				index += 1 if ((i += 1) % div == 0 && index < colour_size) && i > 1
-				val.concat("\e[38;5;#{clr[index]}m#{str[i]}")
-			end
-		end
-
-		val + "\e[0m"
+	while i < str_len do
+		s = slice(i += 1)
+		index += 1 if ((i) % div == 0 && index < colour_size) && i > 1 && s != "\s"
+		return_val.concat("\e[38;5;#{clr[index]}m#{s}")
 	end
+
+	return_val + "\e[0m"
 end
 
-Float.define_method(:pad) { to_s.then { |v| v.split('.')[-1].length == 1 ? v + '0' : v } }
+Float.define_method(:pad) { round(::ROUND).to_s.then { |x| x.split('.')[1].to_s.length.then { |y| y < ROUND && y != 0 ? x + '0'.*(ROUND - y)  : x } } }
+Float.define_method(:percent) { |arg| fdiv(100).*(arg) }
 
 def main(sleep = 0.05)
 	split_colour = [203, 198, 199, 164, 129, 93, 63, 33, 39, 44, 49, 48, 83, 118, 184, 214, 208]
 	swap, cpu_usage, cpu_bar = '', '', ''
 
-	bars = %W(\xE2\x96\x81 \xE2\x96\x83 \xE2\x96\x85)
+	bars = %W(\xE2\x96\x81 \xE2\x96\x83 \xE2\x96\x85 \xE2\x9A\xA0)
 	clocks = %W(\xF0\x9F\x95\x9B \xF0\x9F\x95\x90 \xF0\x9F\x95\x91 \xF0\x9F\x95\x92 \xF0\x9F\x95\x93 \xF0\x9F\x95\x94 \xF0\x9F\x95\x95 \xF0\x9F\x95\x96
 					\xF0\x9F\x95\x97 \xF0\x9F\x95\x98 \xF0\x9F\x95\x99 \xF0\x9F\x95\x9A)
 
@@ -44,8 +42,8 @@ def main(sleep = 0.05)
 		width = STDOUT.winsize[1]
 
 		# calculate memory usage
-		mem_total, mem_available = IO.readlines('/proc/meminfo').then { |x| [x[0], x[2]] }.map(&:split).then { |x| [x[0][1], x[1][1]] }.map { |x| x.to_i./(1024.0).round(2) }
-		mem_used = mem_total.-(mem_available).round(2)
+		mem_total, mem_available = IO.readlines('/proc/meminfo').then { |x| [x[0], x[2]] }.map(&:split).then { |x| [x[0][1], x[1][1]] }.map { |x| x.to_i./(1024.0) }
+		mem_used = mem_total.-(mem_available)
 
 		# calculate swap usage
 		swap_devs = IO.readlines('/proc/swaps')[1..-1].map(&:split).map { |x| [x[0], x[2], x[3]] }
@@ -65,28 +63,31 @@ def main(sleep = 0.05)
 			totald = idle + (@user + @nice + @sys + @irq + @softirq + @steal) -
 			(previdle + (@prev_user + @prev_nice + @prev_sys + @prev_irq + @prev_softirq + @prev_steal))
 
-			cpu_percentage = ((totald - (idle - previdle)) / totald * 100.0).round(1)
-			cpu_bar.replace(cpu_percentage < 33 ? bars[0] : cpu_percentage < 66 ? bars[1] : bars[2])
+			cpu_percentage = ((totald - (idle - previdle)) / totald * 100.0)
+			cpu_bar.replace(cpu_percentage < 33 ? bars[0] : cpu_percentage < 66 ? bars[1] : cpu_percentage.nan? ? bars[3] : bars[2])
 			cpu_usage.concat("\e[38;5;".+((cpu_percentage < 33 ? COLOUR1 : cpu_percentage < 66 ? COLOUR2 : COLOUR3).to_s).+('m').+("#{cpu_bar} CPU #{i == 0 ? 'Total' : i}: #{cpu_percentage.pad} %\e[0m\n"))
 		end
 
 		# String formatting and colourizing
 		tot = "Total: #{mem_total.pad} MiB"
 		used = " \xf0\x9f\x93\x89Used: #{mem_used.pad} MiB".center(width - tot.length * 2).rstrip
-		mem_colour = "\e[38;5;#{mem_used < mem_total / 3 ? COLOUR1 : mem_used < mem_total / 2 ? COLOUR2 : COLOUR3}m"
+		mem_colour = "\e[38;5;#{mem_used < mem_total.percent(33) ? COLOUR1 : mem_used < mem_total.percent(66) ? COLOUR2 : COLOUR3}m"
 
 		swap.clear
 		swap_devs.size.times do |sd|
 			dev = swap_devs[sd]
-			al, av = dev[1].to_f./(1024).round(2), dev[2].to_f./(1024).round(2)
+			al, av = dev[1].to_f./(1024), dev[2].to_f./(1024)
 
-			swap_colour = "\e[38;5;#{av < al / 3 ? COLOUR1 : av < al / 2 ? COLOUR2 : COLOUR3}m"
+			swap_colour = "\e[38;5;#{av < al.percent(33) ? COLOUR1 : av < al.percent(66) ? COLOUR2 : COLOUR3}m"
 
-			allocated = "Total: #{al} MiB"
+			allocated = "Total: #{al.pad} MiB"
 			usage = " \xF0\x9F\x93\x8AUsed: #{av.pad} MiB".center(width - allocated.length * 2 - 1).rstrip
-			available = swap_colour + " \xF0\x9F\x93\x8AAvailable: #{dev[1].to_f.-(dev[2].to_f)./(1024).round(2).pad} MiB".rjust(width - allocated.length - usage.length - 2) + "\e[0m"
+			available = swap_colour + " \xF0\x9F\x93\x8AAvailable: #{dev[1].to_f.-(dev[2].to_f)./(1024).pad} MiB".rjust(width - allocated.length - usage.length - 2) + "\e[0m"
 
-			swap.concat("#{SWAP_LABEL}\xE2\x80\xA3 #{dev[0]} \xF0\x9F\xA2\x90\e[0m\n" + swap_colour + allocated + usage + available + "\n\n")
+			swap.concat(
+				'Swap'.center(width - 2).colourize(split_colour) + "\n" + '-'.*(width).colourize + swap + "\n" +
+					"#{SWAP_LABEL}\xE2\x80\xA3 #{dev[0]} \xF0\x9F\xA2\x90\e[0m\n" + swap_colour + allocated + usage + available + "\n\n"
+			)
 		end
 
 		# time
@@ -101,18 +102,18 @@ def main(sleep = 0.05)
 			('-' * width).colourize(split_colour) +
 			mem_colour + tot + "\e[0m" + mem_colour + used + "\e[0m" + mem_colour +
 			" \xf0\x9f\x93\x89Available: #{mem_available.pad} MiB".rjust(width - tot.length - used.length - 2) + "\e[0m\n\n" +
-			'Swap'.center(width - 2).colourize(split_colour) + "\n" + '-'.*(width).colourize + swap + "\n" +
-			'CPU Usage'.center(width).colourize(split_colour) + "\n" + '-'.*(width).colourize + cpu_usage +
-			"\n" + 'Frequency: '.colourize + "\n" +
+			swap +
+			'CPU Usage'.center(width).colourize(split_colour) + "\n" + '-'.*(width).colourize + cpu_usage + "\n" +
+			'Frequencies: '.colourize + "\n" +
 
 			(0..3).map do |i|
-				"CPU#{i.next}: #{IO.read("/sys/devices/system/cpu/cpu#{i}/cpufreq/cpuinfo_cur_freq").to_f./(1000.0).round(2).pad} MHz"
+				"CPU#{i.next}: #{IO.read("/sys/devices/system/cpu/cpu#{i}/cpufreq/cpuinfo_cur_freq").to_f./(1000.0).pad} MHz"
 				.colourize(split_colour)
-			end.join("\n") +
+			end.join("\n") + "\n\n" +
 
-			"\n" + 'Temperature: '.colourize(split_colour) +
+			'Temperature: '.colourize(split_colour) +
 
-			IO.read('/sys/class/thermal/thermal_zone0/temp').to_i./(1000.0).then{ |c| "#{c.round(2)}\xC2\xB0C | #{c.*(1.8).+(32).round(2)}\xC2\xB0F" }
+			IO.read('/sys/class/thermal/thermal_zone0/temp').to_i./(1000.0).then{ |c| "#{c.pad}\xC2\xB0C | #{c.*(1.8).+(32).pad}\xC2\xB0F" }
 				.colourize(split_colour) + "\n" +
 
 			'Time'.center(width).colourize(split_colour) + '-'.*(width).colourize +

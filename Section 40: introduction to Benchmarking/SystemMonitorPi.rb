@@ -105,7 +105,7 @@ def main(sleep = 0.05)
 		mem_colour = "\e[38;5;#{mem_used < mem_total.percent(33) ? COLOUR1 : mem_used < mem_total.percent(66) ? COLOUR2 : COLOUR3}m"
 
 		swap.clear
-		swap.replace('Swap'.center(width - 2).colourize(split_colour) + "\n" + '-'.*(width).colourize +
+		swap.concat('Swap'.center(width - 2).colourize(split_colour) + "\n" + '-'.*(width).colourize +
 			swap_devs.size.times.map do |sd|
 				dev = swap_devs[sd]
 				al, av = dev[1].to_f./(1024), dev[2].to_f./(1024)

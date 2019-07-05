@@ -1,4 +1,7 @@
 #!/usr/bin/env ruby
+puts "This is #{RUBY_PLATFORM}. Which is an unsupported platform. Please use a GNU/Linux system.." unless /linux/ === RUBY_PLATFORM
+puts "The Ruby Version is too old for #{File.basename(__FILE__)} to work. Make sure you have at lease Ruby 2.5.0+" if (RUBY_VERSION.split('.').first(2).join.to_i < 25)
+
 GC.start(full_mark: true, immediate_sweep: true)
 require 'io/console'
 
@@ -29,6 +32,31 @@ end
 
 Float.define_method(:pad) { round(::ROUND).to_s.then { |x| x.split('.')[1].to_s.length.then { |y| y < ROUND && y != 0 ? x + '0'.*(ROUND - y)  : x } } }
 Float.define_method(:percent) { |arg| fdiv(100).*(arg) }
+
+def help
+	split_colour = [203, 198, 199, 164, 129, 93, 63, 33, 39, 44, 49, 48, 83, 118, 184, 214, 208]
+
+	STDOUT.puts <<~EOF.each_line.map { |x| x.rstrip.colourize(split_colour.rotate!) }
+		#{File.basename(__FILE__)} is a lighweight and simple resource monitoring program.
+		It can measure memory usage, swap usage, CPU usage, and display time and uptime.
+
+		Usage:
+			#{$PROGRAM_NAME} [arguments]
+
+		Arguments:
+			1. --format= / -f=		The format of the time. [Default: %I:%M:%S:%#{ROUND}N %p ]
+			2. --help / -h			Show this help message.
+			3. --round= / -r=		Precision of the decimal places. [Default: 2]
+			4. --sleep= / -s= / -d=		Delay while measuring the CPU usage. [Default: 0.125]
+							[Will affect the refresh time of the overall program]
+	EOF
+	exit! 0
+end
+
+help if ARGV.include?('-h') | ARGV.include?('--help')
+
+ARGV.find { |x| x.to_s !~ /-(r|f|s|d)=|--(round|format|sleep)=/ }.to_s
+	.tap { |x| (STDOUT.puts("Invalid Argument `#{x}'. Run #{$PROGRAM_NAME} --help for a manual.".colourize) || exit!(0)) unless x.empty? }
 
 def main(sleep = 0.05)
 	split_colour = [203, 198, 199, 164, 129, 93, 63, 33, 39, 44, 49, 48, 83, 118, 184, 214, 208]
@@ -74,21 +102,20 @@ def main(sleep = 0.05)
 		mem_colour = "\e[38;5;#{mem_used < mem_total.percent(33) ? COLOUR1 : mem_used < mem_total.percent(66) ? COLOUR2 : COLOUR3}m"
 
 		swap.clear
-		swap_devs.size.times do |sd|
-			dev = swap_devs[sd]
-			al, av = dev[1].to_f./(1024), dev[2].to_f./(1024)
+		swap.replace('Swap'.center(width - 2).colourize(split_colour) + "\n" + '-'.*(width).colourize +
+			swap_devs.size.times.map do |sd|
+				dev = swap_devs[sd]
+				al, av = dev[1].to_f./(1024), dev[2].to_f./(1024)
 
-			swap_colour = "\e[38;5;#{av < al.percent(33) ? COLOUR1 : av < al.percent(66) ? COLOUR2 : COLOUR3}m"
+				swap_colour = "\e[38;5;#{av < al.percent(33) ? COLOUR1 : av < al.percent(66) ? COLOUR2 : COLOUR3}m"
 
-			allocated = "Total: #{al.pad} MiB"
-			usage = " \xF0\x9F\x93\x8AUsed: #{av.pad} MiB".center(width - allocated.length * 2 - 1).rstrip
-			available = swap_colour + " \xF0\x9F\x93\x8AAvailable: #{dev[1].to_f.-(dev[2].to_f)./(1024).pad} MiB".rjust(width - allocated.length - usage.length - 2) + "\e[0m"
+				allocated = "Total: #{al.pad} MiB"
+				usage = " \xF0\x9F\x93\x8AUsed: #{av.pad} MiB".center(width - allocated.length * 2 - 1).rstrip
+				available = swap_colour + " \xF0\x9F\x93\x8AAvailable: #{dev[1].to_f.-(dev[2].to_f)./(1024).pad} MiB".rjust(width - allocated.length - usage.length - 2) + "\e[0m"
 
-			swap.concat(
-				'Swap'.center(width - 2).colourize(split_colour) + "\n" + '-'.*(width).colourize +
-					+ "#{SWAP_LABEL}\xE2\x80\xA3 #{dev[0]} \xF0\x9F\xA2\x90\e[0m\n" + swap_colour + allocated + usage + available + "\n\n"
-			)
-		end
+		 		"#{SWAP_LABEL}\xE2\x80\xA3 #{dev[0]} \xF0\x9F\xA2\x90\e[0m\n" + swap_colour + allocated + usage + available + "\n\n"
+			end.join
+		) unless swap_devs.empty?
 
 		# time
 		hr, min, sec = IO.read('/proc/uptime').to_i.then do

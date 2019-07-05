@@ -77,24 +77,26 @@ def main(sleep = 0.05)
 		swap_devs = IO.readlines('/proc/swaps')[1..-1].map(&:split).map { |x| [x[0], x[2], x[3]] }
 
 		# calculate CPU usage
-		cpu_usage.clear
 		prev_file = IO.readlines('/proc/stat').select { |line| line.start_with?('cpu') }
 		Kernel.sleep(sleep)
 		file = IO.readlines('/proc/stat').select { |line| line.start_with?('cpu') }
 
-		file.size.times do |i|
-			data, prev_data = file[i].split.map(&:to_f), prev_file[i].split.map(&:to_f)
+		cpu_usage.replace(
+			file.size.times.map do |i|
+				data, prev_data = file[i].split.map(&:to_f), prev_file[i].split.map(&:to_f)
 
-			%w(user nice sys idle iowait irq softirq steal).each_with_index { |e, i| binding.eval "@#{e}, @prev_#{e} = #{data[i += 1]}, #{prev_data[i]}" }
+				%w(user nice sys idle iowait irq softirq steal).each_with_index { |e, i| binding.eval "@#{e}, @prev_#{e} = #{data[i += 1]}, #{prev_data[i]}" }
 
-			previdle, idle = @prev_idle + @prev_iowait, @idle + @iowait
-			totald = idle + (@user + @nice + @sys + @irq + @softirq + @steal) -
-			(previdle + (@prev_user + @prev_nice + @prev_sys + @prev_irq + @prev_softirq + @prev_steal))
+				previdle, idle = @prev_idle + @prev_iowait, @idle + @iowait
+				totald = idle + (@user + @nice + @sys + @irq + @softirq + @steal) -
+				(previdle + (@prev_user + @prev_nice + @prev_sys + @prev_irq + @prev_softirq + @prev_steal))
 
-			cpu_percentage = ((totald - (idle - previdle)) / totald * 100.0)
-			cpu_bar.replace(cpu_percentage < 33 ? bars[0] : cpu_percentage < 66 ? bars[1] : cpu_percentage.nan? ? bars[3] : bars[2])
-			cpu_usage.concat("\e[38;5;".+((cpu_percentage < 33 ? COLOUR1 : cpu_percentage < 66 ? COLOUR2 : COLOUR3).to_s).+('m').+("#{cpu_bar} CPU #{i == 0 ? 'Total' : i}: #{cpu_percentage.pad} %\e[0m\n"))
-		end
+				cpu_percentage = ((totald - (idle - previdle)) / totald * 100.0)
+				cpu_bar.replace(cpu_percentage < 33 ? bars[0] : cpu_percentage < 66 ? bars[1] : cpu_percentage.nan? ? bars[3] : bars[2])
+				"\e[38;5;"+ (cpu_percentage < 33 ? COLOUR1 : cpu_percentage < 66 ? COLOUR2 : COLOUR3).to_s + 'm' +
+					"#{cpu_bar} CPU #{i == 0 ? 'Total' : i}: #{cpu_percentage.pad} %"
+			end.join("\e[0m\n") + "\n"
+		)
 
 		# String formatting and colourizing
 		tot = "Total: #{mem_total.pad} MiB"

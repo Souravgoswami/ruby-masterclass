@@ -1,4 +1,4 @@
-#!/usr/bin/ruby -w
+#!/usr/bin/env ruby
 puts "This is #{RUBY_PLATFORM}. Which is an unsupported platform. A GNU/Linux system is needed" unless /linux/ === RUBY_PLATFORM
 puts "The Ruby Version is too old for #{File.basename(__FILE__)} to work. Make sure you have at lease Ruby 2.5.0+" if (RUBY_VERSION.split('.').first(2).join.to_i < 25)
 

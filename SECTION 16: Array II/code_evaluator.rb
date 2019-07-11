@@ -1,8 +1,8 @@
 #!/usr/bin/ruby -w
-require 'zlib'
 STDOUT.sync = STDERR.sync = true
 DICTIONARY_PATH = File.join(File.expand_path('..', __dir__), 'Dictionary Lookup', 'words.gz')
 $dictionary_lookup = File.readable?(DICTIONARY_PATH)
+require 'zlib' if $dictionary_lookup
 
 module Kernel
 	undef p

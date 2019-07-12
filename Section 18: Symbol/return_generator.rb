@@ -1,6 +1,6 @@
 #!/usr/bin/ruby -w
 require_relative(File.join(__dir__, 'code_evaluator'))
-$dictionary_lookup = false
+# $dictionary_lookup = false
 
 save_as(
 	%w(

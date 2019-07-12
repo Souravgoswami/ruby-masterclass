@@ -1,4 +1,7 @@
 #!/usr/bin/ruby -w
+# Fri Jul 12 17:36:43 2019
+# ruby 2.6.3
+# Encoding: UTF-8
 # PART 2
 
 # Symbols are used in place of light weight strings

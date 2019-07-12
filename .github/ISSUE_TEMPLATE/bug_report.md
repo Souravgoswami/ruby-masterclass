@@ -23,12 +23,12 @@ Steps to reproduce the behavior:
 
 If applicable, add screenshots to help explain your problem.
 
-**\[Optional\] Ruby Installation Details: 💎**
+**\[Optional\] Ruby Installation Details 💎**
 
  - RUBY_PLATFORM: [e.g. "x86_64-linux"]
  - RUBY_ENGINE: [e.g. "ruby" / "jruby" / "mruby"]
  - RUBY_VERSION: [e.g. 2.6.3]
 
-**\[Optional\]: Additional context 📝**
+**\[Optional\] Additional context 📝**
 
 Add any other context about the problem / feature here.

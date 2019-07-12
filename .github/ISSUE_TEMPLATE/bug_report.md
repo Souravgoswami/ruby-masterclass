@@ -7,17 +7,22 @@ assignees: ''
 
 ---
 
-**Describe the bug / feature 🐞💡**
+**Describe the Bug 🐞**
 
-A clear and concise description of what the bug / feature is.
+A clear and concise description of what the bug is.
 
 **\[Optional\] Step To Reproduce 🎨**
 
-Steps to reproduce the behavior:
-1. Go to '...'
-2. Click on '....'
-3. Scroll down to '....'
-4. See error
+Steps to reproduce the behaviour:
+1. Go to Section...
+2. Click on the / run '....'
+3. See error
+
+**\[Optional\] Steps to Fix 👨🏻‍🔬👩🏻‍🔬**
+
+Steps to fix the bugs:
+1. Use ... instead of ...
+2. Use ... instead of ...
 
 **\[Optional\] Screenshots 📸**
 

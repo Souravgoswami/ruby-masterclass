@@ -1,11 +1,11 @@
-#!/usr/bin/env ruby
-%w(ruby2d securerandom open3).each { |el| require(el) }
+#!/usr/bin/ruby -w
+%w(ruby2d open3).each { |el| require(el) }
 
 WIDTH = 1280
 HEIGHT = 720
 FPS = 120
 SIZE = 300
-PARTICLES = 500
+PARTICLES = 1_200
 FROZEN_PARTICLES = 100
 TITLE = 'Ruby 2D'
 BORDER = true
@@ -13,106 +13,134 @@ BORDER = true
 define_method(:main) do |width = 640, height = 480, fps = 60, size = 100, particle = 500, frozen_particle = 100, title = 'Ruby 2D', border = true|
 	@width, @height, @size, @fullscreen = width, height, size, ARGV.find { |a| a =~ /[0-9]/ }.to_i
 	set width: @width, height: @height, fps_cap: fps, resizable: true, title: title, background: '#000000', fullscreen: @fullscreen.odd?, borderless: not(border)
+	selected_pattern = 0
 
-	frozen_particle.times { Square.new(size: rand(1..3), x: rand(@width), y: rand(@height), color: "##{SecureRandom.hex(3)}") }
-	particles = Array.new(particle) { Square.new(size: rand(1..3), x: rand(@width), y: rand(@height), color: "##{SecureRandom.hex(3)}") }.freeze
+	particles_op, div, op2 = PARTICLES * 200.0, PARTICLES / 3.0, PARTICLES * 4.0
+
+	particles = Array.new(particle) { Square.new(size: rand(1..3), x: rand(@width), y: rand(@height), color: [rand, rand, rand, 1]) }.freeze
+	particles.each { |x| x.size = 0 }
+	j = 0
+
+	patterns = [
+		'
+			particles.each_with_index do |o, i|
+				o.y += i / (particle / 2.0)
+				o.x, o.y, o.size, o.color = rand(@width), 0, rand(1..3), [rand, rand, rand, 1] if o.y > @height + o.height
+			end
+		',
+
+		'
+			particles.each_with_index do |o, i|
+				o.x, o.y, o.opacity = o.x + Math.cos(i) * i / div, o.y + Math.sin(i) * i / div, o.opacity - i / particles_op
+				o.size = o.size.send((o.size >= 2 ? :- : :+), 0.1)
+				o.color = [rand, rand, rand, o.opacity]
+				o.x, o.y, o.size, o.opacity = WIDTH / 2, HEIGHT / 2, 0.1, 1 unless o.opacity > 0
+			end
+		',
+
+		'
+			particles.each_with_index do |o, i|
+				o.x, o.y, o.opacity = o.x + Math.cos(i) * i / div, o.y + Math.sin(i) * i / div, o.opacity - i / particles_op
+				o.size = o.size.send(o.size >= 2 ? :- : :+, 0.1)
+				o.x, o.y, o.size, o.color = WIDTH / 2, HEIGHT / 2, 0.1, [rand, rand, rand, 1] unless o.opacity > 0
+			end
+		',
+
+		'
+			particles.each_with_index do |o, i|
+				o.x, o.y, o.opacity = o.x + Math.cos(i) * i / div, o.y + Math.sin(i) * i / div, o.opacity - i / particles_op
+				o.size = o.size.send((o.size >= 2 ? :- : :+), 0.1)
+				o.g += 0.025
+				o.b -= 0.0025
+				o.r += i / 100.0
+				o.x, o.y, o.size, o.color = WIDTH / 2, HEIGHT / 2, 0.1, [0, 0, 1, 1] unless o.opacity > 0
+			end
+		',
+
+		'
+			j += 0.000025
+			particles.each_with_index do |o, i|
+				o.x = Math.sin(i * j) * @width / 2.0 + @width / 2
+				o.y = Math.tan(i) * @height / 8.0 + @height / 2
+				o.size = 2
+				o.color = [rand, rand, rand, 1]
+			end
+		'
+	].freeze
+
+	frozen_particle.times { Square.new(size: rand(1..3), x: rand(@width), y: rand(@height), color: [rand, rand, rand, 1]) }
 
 	quad = Quad.new(
 		x1: @width / 2 - @size / 2, y1: @height / 2 - @size / 4,
 		x2: @width / 2 + -@size / 4, y2: @height / 2 - @size / 2,
 		x3: @width / 2 + @size / 4, y3: @height / 2 - @size / 2,
 		x4: @width / 2 + @size / 2, y4: @height / 2 - @size / 4,
-		color: %w(#DA3337 #FF00FF #FF00FF #DA3337)
+		color: %w(#F74F4C #F74F4C #F74F4C #F74F4C)
 	)
 
-	(1..4).each { |el| eval %Q{@x#{el}, @y#{el} = quad.x#{el}, quad.y#{el}} }
+	(1..4).each { |el| binding.eval %Q{@x#{el}, @y#{el} = quad.x#{el}, quad.y#{el}} }
 	centre = quad.x1.+(quad.x4)./(2)
 
 	base = Triangle.new(
-		color: '#DA3337',
-		x1: centre, x2: @x4, x3:@x1,
+		color: '#E73834',
+		x1: centre, x2: @x4, x3: @x1,
 		y1: size + @y1 / 1.5, y2: @y1, y3: @y1
 	)
 
 	right_base = Triangle.new(
-		color: %w(#FF0000 #FFFF00 #FF00FF), z: 1, opacity: 1,
-		x1: (@x1 + centre) / 2, x2: @x1, x3: centre,
-		y1: (base.y1 + base.y2) / 2, y2: base.y2, y3: base.y3,
+		color: '#F64542', z: 1, opacity: 1,
+		x3: @x1, x1: centre, x2: @x2,
+		y1: base.y1, y2: base.y2, y3: base.y3,
 	)
 
 	left_base = Triangle.new(
-		color: %w(#FFFFFF #3CE3B4 #FF00FF),
-		x1: (centre + @x4) / 2, x2: centre, x3: @x4,
-		y1: (base.y1 + base.y2) / 2, y2: base.y2, y3: base.y3
+		color: '#D83431', z: 1, opacity: 1,
+		x2: @x4, x1: centre, x3: @x3,
+		y1: base.y1, y2: base.y2, y3: base.y3,
 	)
 
-	centre_base = Triangle.new(
-		color: %w(#FFFF00 #FFFFFF #FF00FF),
-		x1: right_base.x1, x2: left_base.x1, x3: centre,
-		y1: right_base.y1, y2: right_base.y1, y3: right_base.y2
+	top1 = Triangle.new(
+		color: '#EE3A36', z: 1, opacity: 1,
+		x1: right_base.x2, x2: right_base.x1, x3: right_base.x2,
+		y1: right_base.y2, y2: @y2, y3: @y2
 	)
 
-	down_base = Triangle.new(
-		color: %w(#FF0000 #FF00FF #FFFFFF), z: 1, opacity: 1,
-		x1: right_base.x1, x2: left_base.x1, x3: centre,
-		y1: centre_base.y1, y2: centre_base.y2, y3: base.y1
-	)
-
-	t1 = Triangle.new(
-		color: %w(#FFFF00 #FF00FF #FF50A6), opacity: 0.75,
-		x1: @x3, x2: centre, x3: @x4,
-		y1: @y2, y2: @y1, y3: @y1
-	)
-
-	t2 = Triangle.new(
-		x1: centre, x2: @x3, x3: @x2,
-		y1: @y3, y2: @y1, y3: @y1,
-		color: '#FFFFFF', opacity: 0.5
-	)
-
-	t3 = Triangle.new(
-		x1: centre, x2: @x3, x3: @x2,
-		y1: @y1, y2: @y2, y3: @y3,
-		color: '#FFFFFF', opacity: 0.5,
+	top2 = Triangle.new(
+		color: '#EE3A36', z: 1, opacity: 1,
+		x1: left_base.x3, x2: left_base.x3, x3: top1.x2,
+		y1: left_base.y2, y2: @y2, y3: @y3
 	)
 
 	change_size = proc do |op|
 		if op
-			quad.x1, quad.x2 = quad.x1.method(op).(-2), quad.x2.method(op).(-1)
-			quad.x3, quad.x4 = quad.x3.method(op).(1), quad.x4.method(op).(2)
-			quad.y1, quad.y2 = quad.y1.method(op).(1), quad.y2.method(op).(-1)
-			quad.y3, quad.y4 = quad.y3.method(op).(-1), quad.y4.method(op).(1)
+			quad.x1, quad.x2 = quad.x1.send(op, -2), quad.x2.send(op, -1)
+			quad.x3, quad.x4 = quad.x3.send(op, 1), quad.x4.send(op, 2)
+			quad.y1, quad.y2 = quad.y1.send(op, 1), quad.y2.send(op, -1)
+			quad.y3, quad.y4 = quad.y3.send(op, -1), quad.y4.send(op, 1)
 
-			(1..4).each { |el| eval %Q{@x#{el}, @y#{el} = quad.x#{el}, quad.y#{el}} }
+			(1..4).each { |el| binding.eval %Q{@x#{el}, @y#{el} = quad.x#{el}, quad.y#{el}} }
 			centre = quad.x1.+(quad.x4)./(2)
 
-			base.y1, base.y2, base.y3 = (@x4 - @x1) + @y1 / 1.5, base.y2.method(op).(1), base.y3.method(op).(1)
 			base.x1, base.x2, base.x3 = centre, @x4, @x1
+			base.y1, base.y2, base.y3 = (@x4 - @x1) + @y1 / 1.5, @y1, @y1
 
-			right_base.x1, right_base.x2, right_base.x3 = (@x1 + centre) / 2, @x1, centre
-			right_base.y1, right_base.y2, right_base.y3 = (base.y1 + base.y2) / 2, base.y2, base.y3
+			right_base.x1, right_base.x2, right_base.x3 = centre, @x2, @x1
+			right_base.y1, right_base.y2, right_base.y3 = base.y1, base.y2, base.y3
 
-			left_base.x1, left_base.x2, left_base.x3 = (centre + @x4) / 2, centre, @x4
-			left_base.y1, left_base.y2, left_base.y3 = (base.y1 + base.y2) / 2, base.y2, base.y3
+			left_base.x1, left_base.x2, left_base.x3 = centre, @x4, @x3
+			left_base.y1, left_base.y2, left_base.y3 = base.y1, base.y2, base.y3
 
-			centre_base.x1, centre_base.x2, centre_base.x3 = right_base.x1, left_base.x1, centre
-			centre_base.y1, centre_base.y2, centre_base.y3 = right_base.y1, right_base.y1, right_base.y2
+			top1.x1, top1.x2, top1.x3 = right_base.x2, right_base.x1, right_base.x2
+			top1.y1, top1.y2, top1.y3 = right_base.y2, @y2, @y2
 
-			down_base.x1, down_base.x2, down_base.x3 = right_base.x1, left_base.x1, centre
-			down_base.y1, down_base.y2, down_base.y3 = centre_base.y1, centre_base.y2, base.y1
-
-			t1.x1, t1.x2, t1.x3 = @x3, centre, @x4
-			t1.y1, t1.y2, t1.y3 = @y3, @y1, @y1
-
-			t2.x1, t2.x2, t2.x3 = centre, @x3, @x2
-			t2.y1, t2.y2, t2.y3 = @y3, @y1, @y1
-
-			t3.x1, t3.x2, t3.x3 = centre, @x3, @x2
-			t3.y1, t3.y2, t3.y3 = @y1, @y2, @y3
+			top2.x1, top2.x2, top2.x3 = left_base.x3, left_base.x3, top1.x2
+			top2.y1, top2.y2, top2.y3 = left_base.y2, @y2, @y3
 		end
 	end
 
-	on :mouse_scroll do |e| change_size.(e.delta_y == -1 ? :+ : :-) end
+	ruby = [quad, base, right_base, left_base, top1, top2]
+
+	on(:mouse_scroll) { |e| change_size.(e.delta_y == -1 ? :+ : :-) }
 
 	on :key_held do |k|
 		change_size.(
@@ -123,17 +151,20 @@ define_method(:main) do |width = 640, height = 480, fps = 60, size = 100, partic
 	end
 
 	on :key_down do |k|
-		close if Open3.pipeline_start("#{File.join(RbConfig::CONFIG['bindir'], 'ruby')} #{File.join(__FILE__)} #{@fullscreen += 1}") if k.key == 'f11'
-		close if k.key == 'escape'
-		Window.screenshot if k.key == 'printscreen'
-	end
 
-	update do
-		particles.each_with_index do |el, index|
-			el.y += index / (particle / 2.0)
-			el.x, el.y, el.size, el.color = rand(@width), 0, rand(1..3), "##{SecureRandom.hex(3)}" if el.y > @height + el.height
+		case k.key
+			when 'f11' then close if Open3.pipeline_start("#{File.join(RbConfig::CONFIG['bindir'], 'ruby')} #{File.join(__FILE__)} #{@fullscreen += 1}")
+			when 'escape' then close
+			when 'printscreen' then Window.screenshot
+			when 'right' then selected_pattern = selected_pattern.+(1).%(patterns.size)
+			when 'left' then selected_pattern = selected_pattern.-(1).%(patterns.size)
+			when 's' then particles.each { |x| x.x, x.y, x.color = rand(@width), rand(@height), [rand, rand, rand, 1] }
+			when '-' then ruby.each { |x| x.opacity -= 0.1 if x.opacity > 0 }
+			when '=' then ruby.each { |x| x.opacity += 0.1 if x.opacity < 1 }
 		end
 	end
+
+	update { binding.eval(patterns[selected_pattern]) }
 end
 
 main(WIDTH, HEIGHT, FPS, SIZE, PARTICLES, FROZEN_PARTICLES, TITLE, BORDER)

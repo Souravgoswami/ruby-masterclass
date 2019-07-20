@@ -65,7 +65,7 @@ def evaluate(code)
 
 	# Deal with <begin>, </end> tags and shebang
 	head = code.scan(/\<\s*begin\s*\d*\s*\>/i)[0]
-	code[0, 0] = "#!/usr/bin/ruby -w\n# #{Time.new.ctime}\n# #{RUBY_ENGINE} #{RUBY_VERSION}\n# Encoding: #{__ENCODING__}\n"
+	code[0, 0] = "#!/usr/bin/ruby -w\n# Encoding: #{__ENCODING__}\n# #{Time.new.ctime}\n# #{RUBY_ENGINE} #{RUBY_VERSION}\n"
 	code.gsub!(head, head.to_s.scan(/\d+/)[0].then { |x| x ? "# PART #{x}\n" : '' }) if head
 
 	# Deal with method definitions

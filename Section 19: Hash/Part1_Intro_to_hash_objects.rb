@@ -1,7 +1,7 @@
 #!/usr/bin/ruby -w
-# Sun Jul 21 04:03:50 2019
-# ruby 2.6.3
 # Encoding: UTF-8
+# Sun Jul 21 04:40:33 2019
+# ruby 2.6.3
 # PART 1
 
 # As we have seen array stores (a) value(s) called element(s).

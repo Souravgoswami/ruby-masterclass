@@ -1,10 +1,10 @@
 #!/usr/bin/ruby -w
-# Sun Jul 21 01:52:56 2019
+# Sun Jul 21 04:03:50 2019
 # ruby 2.6.3
 # Encoding: UTF-8
 # PART 8
 
-# The keys methods rerturns all the hash
+# The keys methods returns all the hash
 # keys as an array, and the values method returns all the values
 # as an array:
 hash = {a: 'hello', 1 => 'world', true => false}                           # => {:a=>"hello", 1=>"world", true=>false}

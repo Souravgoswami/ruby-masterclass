@@ -1,5 +1,5 @@
 #!/usr/bin/ruby -w
-# Sun Jul 21 01:52:56 2019
+# Sun Jul 21 04:03:50 2019
 # ruby 2.6.3
 # Encoding: UTF-8
 # PART 1
@@ -34,7 +34,7 @@ p b                                                                             
 
 # Array can store duplicate items.
 # But hashes can't. The key has to be unique. The value can be
-# unique or non-unique
+# unique or duplicate of a key or value.
 
 a = {'Ruby' => 'Java (JRuby)', 'GCC' => 'C', 'Python' => 'C', 'Ruby' => 'C'}                    # => {"Ruby"=>"C", "GCC"=>"C", "Python"=>"C"}
 # warning: key "Ruby" is duplicated and overwritten on line ...

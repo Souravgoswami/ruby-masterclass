@@ -52,7 +52,7 @@ save_as(
 
 			# Array can store duplicate items.
 			# But hashes can't. The key has to be unique. The value can be
-			# unique or non-unique
+			# unique or duplicate of a key or value.
 
 			a = {'Ruby' => 'Java (JRuby)', 'GCC' => 'C', 'Python' => 'C', 'Ruby' => 'C'}
 			# warning: key "Ruby" is duplicated and overwritten on line ...
@@ -167,7 +167,7 @@ save_as(
 		</end>
 
 		<begin 8>
-			# The keys methods rerturns all the hash
+			# The keys methods returns all the hash
 			# keys as an array, and the values method returns all the values
 			# as an array:
 			hash = {a: 'hello', 1 => 'world', true => false}

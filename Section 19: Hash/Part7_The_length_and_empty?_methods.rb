@@ -1,7 +1,7 @@
 #!/usr/bin/ruby -w
 # Encoding: UTF-8
-# Sun Jul 21 04:40:33 2019
-# ruby 2.6.3
+# Sun Jul 21 05:10:13 2019
+# ruby 2.7.0
 # PART 7
 
 # The length / size methods returns the length of the hash

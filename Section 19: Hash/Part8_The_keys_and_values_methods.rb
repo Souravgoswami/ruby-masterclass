@@ -1,7 +1,7 @@
 #!/usr/bin/ruby -w
 # Encoding: UTF-8
-# Sun Jul 21 04:40:33 2019
-# ruby 2.6.3
+# Sun Jul 21 05:10:13 2019
+# ruby 2.7.0
 # PART 8
 
 # The keys methods returns all the hash

@@ -1,7 +1,7 @@
 #!/usr/bin/ruby -w
 # Encoding: UTF-8
-# Sun Jul 21 04:40:33 2019
-# ruby 2.6.3
+# Sun Jul 21 05:10:12 2019
+# ruby 2.7.0
 # PART 5
 
 # The merge method can be used to merge
@@ -15,7 +15,7 @@ ch = ('a'..'z').reduce({}) { |h, c| h.merge(c.intern => v = v.next) }           
 
 'ruby'.downcase.chars.map { |c| ch[c.intern] }.join                                    # => "𝓻𝓾𝓫𝔂"
 
-STDIN.gets.then { |x| x ? x : 'test' }.downcase.chars.map { |c| ch[c.intern] }.join    # => "𝓽𝓮𝓼𝓽"
+STDIN.gets.then { |x| x ? x : 'test' }.downcase.chars.map { |c| ch[c.intern] }.join    # => ""
 
 # The merge method also takes a block:
 p a                                                                                    # => {:a=>100, :b=>200}

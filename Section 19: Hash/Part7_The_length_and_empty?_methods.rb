@@ -1,5 +1,5 @@
 #!/usr/bin/ruby -w
-# Sun Jul 21 01:39:56 2019
+# Sun Jul 21 01:52:56 2019
 # ruby 2.6.3
 # Encoding: UTF-8
 # PART 7
@@ -11,6 +11,6 @@ p a.size                                                      # => 3
 
 # The empty method returns true if the array is empty
 p a.empty?                                                    # => false
-p {}.empty?                                                   # => false
+p({}.empty?)                                                  # => true
 p a.clear.empty?                                              # => true
 p a.empty?                                                    # => true

@@ -72,7 +72,7 @@ save_as(
 		<begin 2>
 			# This is a redundant section that focuses on adding key-value pairs in more detail:
 			# It's very common to see symbols used as hash keys:
-			elements = {:a => 'Argon', :b => 'Boron', :c => 'Chromium', :d => 'Dubnium', e => 'Erbium'}
+			elements = {:a => 'Argon', :b => 'Boron', :c => 'Chromium', :d => 'Dubnium', :e => 'Erbium'}
 			p elements[:a]
 			p elements[:d]
 
@@ -161,7 +161,7 @@ save_as(
 
 			# The empty method returns true if the array is empty
 			p a.empty?
-			p {}.empty?
+			p({}.empty?)
 			p a.clear.empty?
 			p a.empty?
 		</end>

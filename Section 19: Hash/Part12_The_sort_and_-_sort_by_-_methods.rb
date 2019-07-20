@@ -1,5 +1,5 @@
 #!/usr/bin/ruby -w
-# Sun Jul 21 01:39:56 2019
+# Sun Jul 21 01:52:56 2019
 # ruby 2.6.3
 # Encoding: UTF-8
 # PART 12
@@ -11,5 +11,5 @@ p languages.sort_by { |x, y| y <=> x }                                          
 p languages.sort_by { |x, y| x <=> y }                                                                                                        # => [[:c, :compiled], [:ruby, :interpreted], [:crystal, :compiled], [:perl, :interpreted], [:python, :intrpreted], [:cpp, :compiled], [:go, :compiled]]
 
 # Randomizing elements:
-p languages.sort_by { rand }                                                                                                                  # => [[:crystal, :compiled], [:c, :compiled], [:ruby, :interpreted], [:go, :compiled], [:python, :intrpreted], [:cpp, :compiled], [:perl, :interpreted]]
-p languages.to_a.shuffle                                                                                                                      # => [[:ruby, :interpreted], [:perl, :interpreted], [:crystal, :compiled], [:cpp, :compiled], [:python, :intrpreted], [:c, :compiled], [:go, :compiled]]
+p languages.sort_by { rand }                                                                                                                  # => [[:crystal, :compiled], [:perl, :interpreted], [:python, :intrpreted], [:go, :compiled], [:c, :compiled], [:cpp, :compiled], [:ruby, :interpreted]]
+p languages.to_a.shuffle                                                                                                                      # => [[:go, :compiled], [:ruby, :interpreted], [:crystal, :compiled], [:c, :compiled], [:cpp, :compiled], [:perl, :interpreted], [:python, :intrpreted]]

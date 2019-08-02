@@ -9,7 +9,7 @@ This course will cover the basics of the Ruby programming language.
 The course commence date will be disclosed to the interested students.
 
 ## Joining Us 🤝
-Joining the class is only available for the college students from BCA dept. But *anyone* on the web can join the ![Gitter chat](https://gitter.im/ruby-masterclass/ruby-masterclass).
+Joining the class is only available for the college students from BCA dept. But *anyone* on the web can join the [Gitter chat](https://gitter.im/ruby-masterclass/ruby-masterclass).
 
 ## Licence 🔑
 #### Source Codes 🍭

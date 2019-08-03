@@ -6,13 +6,13 @@
 
 # There's also a instance_method method available on classes
 # This could be slower
-p Integer.instance_method(:next).bind(1).call
+p Integer.instance_method(:next).bind(1).call         # => 2
 
 # Another example
 ary = (1..5).to_a
-p Array.instance_method(:delete).bind(ary).call(5)
-p ary
+p Array.instance_method(:delete).bind(ary).call(5)    # => 5
+p ary                                                 # => [1, 2, 3, 4]
 
 str_unbound = String.instance_method(:bytesize)
 a = 'Hello World'
-p str_unbound.bind(a).call
+p str_unbound.bind(a).call                            # => 11
